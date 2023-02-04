@@ -50,14 +50,15 @@ class MyDb {
             SELECT e1.id AS 'Employee ID', 
                 e1.first_name AS 'First Name', 
                 e1.last_name AS 'Last Name', 
-                r.title AS 'Job Title', 
+                r.title AS 'Role', 
                 d.name AS 'Department', 
                 r.salary AS 'Salary', 
                 CONCAT(e2.first_name, ' ', e2.last_name) AS 'Manager'
             FROM employee e1
             JOIN role r ON e1.role_id = r.id
             JOIN department d ON r.department_id = d.id
-            LEFT JOIN employee e2 ON e1.manager_id = e2.id;`
+            LEFT JOIN employee e2 ON e1.manager_id = e2.id
+            ORDER BY e1.id;`
             this.connection.query(sql, function(err, results){
                 if (err) {
                     reject(err);
@@ -101,7 +102,6 @@ class MyDb {
             });
     }
     
-    
 
     addEmployee(first_name, last_name, role, manager){
         // prompt to enter the employee's first name, last name, role, and manager
@@ -109,26 +109,43 @@ class MyDb {
         const insertSql = `
         INSERT INTO employee (first_name, last_name, role_id, manager_id) 
         VALUES (?, ?, ?, ?)`;
+
         const selectRoleId = `SELECT id FROM role WHERE title = ?`;
     
-        const selectManagerId = `SELECT e1.id FROM employee e1 JOIN employee e2 ON e1.manager_id = e2.id  WHERE e1.first_name = ? AND e1.last_name = ?`
+        const selectManagerId = `SELECT id FROM employee WHERE first_name = ? AND last_name = ?`;
+
         var managerFullName = manager.split(" ");
         var managerFirstName = managerFullName[0];
         var managerLastName = managerFullName[1];
-    
-        return this.connection.promise().query(selectRoleId,selectManagerId, [role, managerFirstName, managerLastName])
-            .then(([rows]) => {
-                if (!rows.length) {
-                    return Promise.reject(`No manager found with first name "${managerFirstName} or last name ${managerLastName}"`);
+
+        // Retrieve role_Id
+        return this.connection.promise().query(selectRoleId, [role])
+            .then(([roleRows]) => {
+                // console.log("roleRows:", roleRows);
+                if (!roleRows.length) {
+                    return Promise.reject(`No role found with title "${role}"`);
                 }
-                const roleId = rows[0].id;
-                return this.connection.promise().query(insertSql, [first_name, last_name, role, manager]);
+                const roleId = roleRows[0].id;
+                // console.log("roleId:", roleId);
+                // console.log(selectManagerId, [managerFirstName, managerLastName]);
+                // Retrieve manager_Id
+                return this.connection.promise().query(selectManagerId, [managerFirstName, managerLastName])
+                    .then(([managerRows]) => {
+                        // console.log("managerRows:", managerRows);
+                        if (!managerRows.length) {
+                            return Promise.reject(`No manager found with first name "${managerFirstName}" or last name "${managerLastName}"`);
+                        }
+                        const managerId = managerRows[0].id;
+                        // console.log("managerId:", managerId);
+                        // Add an employee with their fist_name, last_name, role_Id and their manager_Id
+                        return this.connection.promise().query(insertSql, [first_name, last_name, roleId, managerId]);
+                    });
             })
             .catch(error => {
                 console.error(error);
             });
     }
-    
+
 
     updateEmployeeRole(employeeName, newRole){
         var employeeFullName = employeeName.split(" ");
