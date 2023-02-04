@@ -14,7 +14,9 @@
 
 A command-line application that helps to manage a company's employee database. This allows you to easily view and interact with information stored in databases..
 
-[Link to the video demonstrating the functionality of the Employee-Tracker App](https://drive.google.com/file/d/1U_yv9IgyEjGWck1yEwFOjafMI1h96Djj/view)
+[Link to the video demonstrating the functionality of the Employee-Tracker App](https://drive.google.com/file/d/1dASXKaEX4JEpey8kh60yNHez3kmDtN5L/view)
+
+![./assets/images/Employee%20Tracker.gif](./assets/images/Employee%20Tracker.gif)
 
 
 ## Table of Contents

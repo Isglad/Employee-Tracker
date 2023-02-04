@@ -97,7 +97,7 @@ function addRole(){
         // Update roleArr after adding new role
         .then((results) => {
             roleArr.push(title);
-            console.log(roleArr);
+            // console.log(roleArr);
             console.log("Added " + title + " to the database.");
             promptUser();
         })
@@ -141,7 +141,7 @@ function addEmployee(){
         console.log("Added " + empFirstName + " " + empLastName + " to the database.");
         // Update empArr after adding new employee
         empArr.push(empFirstName + " " + empLastName);
-        console.log(empArr);
+        // console.log(empArr);
         promptUser();
     })
 };
