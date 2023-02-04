@@ -89,6 +89,7 @@ function addRole(){
         var title = answers.newRole;
         var salary = answers.roleSalary;
         var depart_name = answers.roleDepartment;
+
         db.addRole(title, salary, depart_name)
         .then((results) => {
             console.log("Added " + title + " to the database.");
@@ -122,7 +123,7 @@ function addEmployee(){
         {
             type:"list",
             name:"empManager",
-            message:"What is the employee's manager first name?",
+            message:"What is the employee's manager name?",
             choices:empArr
         }
     ]).then(answers => {
@@ -132,6 +133,9 @@ function addEmployee(){
         var empManager = answers.empManager;
         db.addEmployee(empFirstName, empLastName, empRole, empManager);
         console.log("Added " + empFirstName + " " + empLastName + " to the database.");
+        // Update empArr after adding new employee
+        empArr.push(empFirstName + " " + empLastName);
+        console.log(empArr);
         promptUser();
     })
 };
