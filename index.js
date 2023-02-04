@@ -6,7 +6,7 @@ const empArr = ["John Doe", "Jane Doe", "Jim Smith", "Tom Jones", "Sara Johnson"
 
 const roleArr = ["Marketing Manager", "Sales Representative","Human Resources Specialist", "IT Technician","Financial Analyst", "R&D Engineer", "Product Manager", "Customer Representative", "Operations Manager", "Supply Chain Coordinator"];
 
-
+const departArr = ["Marketing","Sales","Human Resources","Information Technology","Finance","Research and Development","Product Management","Customer Service","Operations","Supply Chain"];
 
 // instance of MyDb
 const db = new MyDb(connection);
@@ -63,6 +63,7 @@ function addDepartment(){
     ]).then(answers => {
         var department = answers.newDepartment;
         db.addDepartment(department);
+        departArr.push(department);
         console.log("Added " + department + " to the database.");
         promptUser();
     })
@@ -82,8 +83,10 @@ function addRole(){
             message:"What is the salary of the role?"
         },
         {
+            type:"list",
             name:"roleDepartment",
-            message:"Which department does the role belong to?"
+            message:"Which department does the role belong to?",
+            choices:departArr
         }
     ]).then(answers => {
         var title = answers.newRole;
@@ -91,7 +94,10 @@ function addRole(){
         var depart_name = answers.roleDepartment;
 
         db.addRole(title, salary, depart_name)
+        // Update roleArr after adding new role
         .then((results) => {
+            roleArr.push(title);
+            console.log(roleArr);
             console.log("Added " + title + " to the database.");
             promptUser();
         })
@@ -152,15 +158,23 @@ function updateEmployeeRole(){
             choices: empArr
         },
         {
+            type:"list",
             name:"newRole",
-            message:"What is the name of the role?"
+            message:"Which role do you want to assign the selected employee?",
+            choices:roleArr
         }
     ]).then(answers => {
         var employee = answers.updateEmployee;
         var newRole = answers.newRole;
-        db.updateEmployeeRole(employee, newRole);
-        console.log(employee + "'s role has been updated in the database.");
-        promptUser();
+        db.updateEmployeeRole(employee, newRole)
+        .then(() => {
+            console.log(employee + "'s role has been updated in the database.");
+            promptUser();
+        })
+        .catch((error) => {
+            console.error(error);
+            promptUser();
+        });
     })
 };
 
